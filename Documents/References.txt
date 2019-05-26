@@ -1,0 +1,2 @@
+https://www.kaggle.com/mrisdal/fake-news 
+	for fake.csv data.
