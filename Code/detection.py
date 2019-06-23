@@ -277,14 +277,14 @@ separation("Vectorization")
 
 vectorizer = TfidfVectorizer(max_df = 0.8, min_df = 0.2) #Read about max_df and min_df
 
-vectorizedTrainStances = vectorizer.fit_transform(trainSetSeries).toarray()
-vectorizedTestStances = vectorizer.transform(testSetSeries).toarray()
+vectorizedTrainArticles = vectorizer.fit_transform(trainSetSeries).toarray()
+vectorizedTestArticles = vectorizer.transform(testSetSeries).toarray()
 
 #transformedTrainStances = transformedTrainStances.astype('int')
 #transformedTestStances = transformedTestStances.astype('int')
 
-print("vectorized Train Stances")
-print(vectorizedTrainStances)
+print("vectorized Train Articles (Headline+body)")
+print(vectorizedTrainArticles)
 
 
 
@@ -302,7 +302,7 @@ separation("Training")
 
 #Train the SVM
 clf = svm.SVC()
-clf.fit(vectorizedTrainStances, transformedTrainStances)
+clf.fit(vectorizedTrainArticles, transformedTrainStances)
 svm.SVC(kernel = 'linear', probability = True, random_state = 0)
 
 
@@ -313,7 +313,7 @@ svm.SVC(kernel = 'linear', probability = True, random_state = 0)
 #==============================================================================================================
 
 separation("Prediction")
-predictions = clf.predict(vectorizedTestStances)
+predictions = clf.predict(vectorizedTestArticles)
 a=numpy.array(transformedTestStances)
 
 count = 0
