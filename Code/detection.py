@@ -31,9 +31,13 @@ testHeadlinesFile = Data_location + "competition_test_stances.csv"
 
 # Loading data 
 trainBodies = pandas.read_csv(trainBodiesFile)
+trainBodiesF = pandas.read_csv(trainBodiesFile)
 trainHeadlines = pandas.read_csv(trainHeadlinesFile)
+trainHeadlinesF = pandas.read_csv(trainHeadlinesFile)
 testBodies = pandas.read_csv(testBodiesFile)
+testBodiesF = pandas.read_csv(testBodiesFile)
 testHeadlines = pandas.read_csv(testHeadlinesFile)
+testHeadlinesF = pandas.read_csv(testHeadlinesFile)
 
 # Internal variables
 Stemmer = SnowballStemmer(Language)
@@ -283,7 +287,8 @@ vectorizedTestArticles = vectorizer.transform(testSetSeries).toarray()
 #transformedTrainStances = transformedTrainStances.astype('int')
 #transformedTestStances = transformedTestStances.astype('int')
 
-print("vectorized Train Articles (Headline+body)")
+print("vectorized Train Articles (Headlines + body) ")
+print("")
 print(vectorizedTrainArticles)
 
 
@@ -294,18 +299,10 @@ print(vectorizedTrainArticles)
 
 separation("Training")
 
-#clf = LogisticRegression(random_state=0, solver='lbfgs',multi_class='multinomial').fit(X, y)
-#clf.predict(X[:2, :])
-#clf.predict_proba(X[:2, :])
-#clf.score(X, y)
-
-
 #Train the SVM
 clf = svm.SVC()
 clf.fit(vectorizedTrainArticles, transformedTrainStances)
 svm.SVC(kernel = 'linear', probability = True, random_state = 0)
-
-
 
 
 #==============================================================================================================
@@ -313,12 +310,66 @@ svm.SVC(kernel = 'linear', probability = True, random_state = 0)
 #==============================================================================================================
 
 separation("Prediction")
-predictions = clf.predict(vectorizedTestArticles)
-a=numpy.array(transformedTestStances)
+predictedStances = clf.predict(vectorizedTestArticles)
+realStances=numpy.array(transformedTestStances)
 
 count = 0
-for i in range (len(predictions)):
-    if predictions[i]==a[i]:
-        count = count + 1
+FoundStances = [None] * len(predictedStances)
+for i in range (len(predictedStances)):
+	if predictedStances[i]==realStances[i]:
+		count = count + 1
+		FoundStances[i] = True
+	else :
+		FoundStances[i] = False
 
-print(count/len(predictions))
+print(count/len(predictedStances))
+
+predictedStances = clf.predict(vectorizedTestArticles)
+
+#==============================================================================================================
+#						Results	
+#==============================================================================================================
+
+separation("Results")
+
+
+# show " related " predictions 
+#for a in range(len(FoundStances)):
+#	if FoundStances[a] == True:
+#		if ( testingData['Stance'][a] == "agree"  ) or  ( testingData['Stance'][a] == "discuss" ) :
+#			print(testingData['Headlines'])
+#			print("")
+#			print(testingData['articleBody'])
+#			separation()
+
+#show " unrelated " predictions
+
+DoNotPrint = False
+
+headline = ""
+article = ""
+
+for a in range(len(FoundStances)):
+	if FoundStances[a] == True :
+		if not ( testingData['Stance'][a] == "agree"  ) or  ( testingData['Stance'][a] == "discuss" ) :
+
+			try:
+				article = testBodiesF['articleBody'][a]
+				try:
+					headline = testHeadlinesF['Headline'][a]
+					print("headline:")
+					print("")
+					print(headline)
+					print("")
+					print("article:")
+					print("")
+					print(article)
+					print("")
+					separation("---")
+				except:
+					pass
+			except:
+				pass
+			headline = ""
+			article = ""
+
